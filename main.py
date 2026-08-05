@@ -51,7 +51,7 @@ async def โหลด(ctx, url: str):
     if os.path.exists(output_filename):
         os.remove(output_filename)
 
-    # ตั้งค่า yt-dlp ปรับ Client เป็น mweb/android เลี่ยงการรัน JS Challenge
+    # ตั้งค่า yt-dlp Options บังคับใช้ client ios และ android_creator เลี่ยง PO Token
     ydl_opts = {
         "format": "b/best",
         "outtmpl": output_filename,
@@ -60,12 +60,10 @@ async def โหลด(ctx, url: str):
         ),
         "extractor_args": {
             "youtube": {
-                "player_client": ["mweb", "android", "ios"],
-                "skip": ["webpage", "configs"],
+                "player_client": ["ios", "android_creator", "mweb"],
             }
         },
-        "quiet": False,
-        "no_warnings": False,
+        "check_formats": None,
     }
 
     try:
