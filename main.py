@@ -57,11 +57,10 @@ async def โหลด(ctx, url: str):
     if os.path.exists(output_filename):
         os.remove(output_filename)
 
-    # ตั้งค่า yt-dlp Options (ปรับปรุงฟอร์แมตให้รองรับวิดีโอทุกแบบ)
+    # ตั้งค่า yt-dlp Options (เลือกไฟล์สำเร็จรูปที่มีทั้งภาพ+เสียง ไม่ต้องผสานไฟล์ด้วย ffmpeg)
     ydl_opts = {
-        "format": "bestvideo+bestaudio/best",
+        "format": "b/best",  # โหลดความละเอียดสูงสุดที่มีภาพและเสียงรวมกันในไฟล์เดียว
         "outtmpl": output_filename,
-        "merge_output_format": "mp4",
         "cookiefile": (
             cookie_file_path if os.path.exists(cookie_file_path) else None
         ),
