@@ -27,7 +27,6 @@ async def on_ready():
 def upload_to_gofile(file_path):
     """ฟังก์ชันอัปโหลดไฟล์ไปที่ Gofile เพื่อเอาสปีดสูงสุด"""
     try:
-        # 1. ขอความช่วยเหลือหาเซิร์ฟเวอร์ที่เร็วที่สุดจาก Gofile
         server_resp = requests.get("https://api.gofile.io/servers").json()
         if server_resp.get("status") != "ok":
             return None
@@ -35,7 +34,6 @@ def upload_to_gofile(file_path):
         server_name = server_resp["data"]["servers"][0]["name"]
         upload_url = f"https://{server_name}.gofile.io/contents/uploadfile"
 
-        # 2. อัปโหลดไฟล์
         with open(file_path, "rb") as f:
             upload_resp = requests.post(upload_url, files={"file": f}).json()
 
@@ -57,13 +55,18 @@ async def โหลด(ctx, url: str):
     if os.path.exists(output_filename):
         os.remove(output_filename)
 
-    # ตั้งค่า yt-dlp Options (เลือกไฟล์สำเร็จรูปที่มีทั้งภาพ+เสียง ไม่ต้องผสานไฟล์ด้วย ffmpeg)
+    # ตั้งค่า yt-dlp Options ปรับใช้ Android API เพื่อเลี่ยงการบล็อก HTTP 429 & PO Token
     ydl_opts = {
-        "format": "b/best",  # โหลดความละเอียดสูงสุดที่มีภาพและเสียงรวมกันในไฟล์เดียว
+        "format": "b/best",
         "outtmpl": output_filename,
         "cookiefile": (
             cookie_file_path if os.path.exists(cookie_file_path) else None
         ),
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "ios"],
+            }
+        },
     }
 
     try:
