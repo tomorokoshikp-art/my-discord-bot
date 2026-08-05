@@ -8,12 +8,10 @@ import yt_dlp
 cookies_content = os.environ.get("YOUTUBE_COOKIES")
 cookie_file_path = "cookie.txt"
 
-# ถ้าเซ็ต Environment Variable ค่า YOUTUBE_COOKIES ไว้ ให้เขียนลงไฟล์ cookie.txt
 if cookies_content:
     with open(cookie_file_path, "w", encoding="utf-8") as f:
         f.write(cookies_content)
 
-# ตั้งค่าสิทธิ์ของบอท
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -25,7 +23,6 @@ async def on_ready():
 
 
 def upload_to_gofile(file_path):
-    """ฟังก์ชันอัปโหลดไฟล์ไปที่ Gofile เพื่อเอาสปีดสูงสุด"""
     try:
         server_resp = requests.get("https://api.gofile.io/servers").json()
         if server_resp.get("status") != "ok":
@@ -51,11 +48,10 @@ async def โหลด(ctx, url: str):
 
     output_filename = "downloaded_video.mp4"
 
-    # ลบไฟล์เก่าถ้ามีค้างอยู่
     if os.path.exists(output_filename):
         os.remove(output_filename)
 
-    # ตั้งค่า yt-dlp Options ปรับใช้ Android API เพื่อเลี่ยงการบล็อก HTTP 429 & PO Token
+    # ตั้งค่า yt-dlp ปรับ Client เป็น mweb/android เลี่ยงการรัน JS Challenge
     ydl_opts = {
         "format": "b/best",
         "outtmpl": output_filename,
@@ -64,23 +60,21 @@ async def โหลด(ctx, url: str):
         ),
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "ios"],
+                "player_client": ["mweb", "android", "ios"],
+                "skip": ["webpage", "configs"],
             }
         },
+        "quiet": False,
+        "no_warnings": False,
     }
 
     try:
-        # 1. โหลดวิดีโอด้วย yt-dlp
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
         if os.path.exists(output_filename):
             await ctx.send("🚀 **กำลังอัปโหลด...**")
-
-            # 2. ส่งขึ้น Gofile
             download_link = upload_to_gofile(output_filename)
-
-            # ลบไฟล์ออกจากเซิร์ฟเวอร์เพื่อเคลียร์พื้นที่
             os.remove(output_filename)
 
             if download_link:
