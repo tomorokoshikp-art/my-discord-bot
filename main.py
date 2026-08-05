@@ -57,9 +57,9 @@ async def โหลด(ctx, url: str):
     if os.path.exists(output_filename):
         os.remove(output_filename)
 
-    # ตั้งค่า yt-dlp Options (ดึง cookie.txt มาใช้อัตโนมัติถ้ามี)
+    # ตั้งค่า yt-dlp Options (ปรับปรุงฟอร์แมตให้รองรับวิดีโอทุกแบบ)
     ydl_opts = {
-        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "format": "bestvideo+bestaudio/best",
         "outtmpl": output_filename,
         "merge_output_format": "mp4",
         "cookiefile": (
@@ -78,7 +78,7 @@ async def โหลด(ctx, url: str):
             # 2. ส่งขึ้น Gofile
             download_link = upload_to_gofile(output_filename)
 
-            # ลบไฟล์ออกจากคอมเพื่อเคลียร์พื้นที่
+            # ลบไฟล์ออกจากเซิร์ฟเวอร์เพื่อเคลียร์พื้นที่
             os.remove(output_filename)
 
             if download_link:
